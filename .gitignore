@@ -1,0 +1,4 @@
+.idea/
+*.pyc
+.DS_Store
+nodepop/node_modules
