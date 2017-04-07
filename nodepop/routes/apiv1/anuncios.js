@@ -6,25 +6,21 @@
 const express = require('express');
 const router = express.Router();
 
+
 // Cargamos mongoose y el modelo de Anuncio
 const mongoose = require('mongoose');
 const Anuncio = mongoose.model('Anuncio');
 
+// authentication con Json Web Token
+const jwtAuth = require('../../lib/jwtAuth');
+router.use(jwtAuth);
 
 // GET - devuelve una lista de anuncios
 router.get('/', function(req, res, next) {
 
-    const query = Anuncio.find();
-    query.exec(function(err, rows) {
-        if (err) {
-            return next(err);
-        }
-        res.json({success: true, result: rows});
-    });
-
-    /*
-    const name = req.query.name;
-    const age = req.query.age;
+    const tag = req.query.tag;
+    const venta = req.query.venta;
+    const precio = req.query.precio;
     const limit = parseInt(req.query.limit);
     const skip = parseInt(req.query.skip);
     const fields = req.query.fields;
@@ -32,12 +28,16 @@ router.get('/', function(req, res, next) {
 
     const filter = {};
 
-    if (name) {
-        filter.name = name;
+    if (tag) {
+        filter.tags =  { $in: [tag] };
     }
 
-    if (age) {
-        filter.age = age;
+    if (venta) {
+        filter.venta = venta;
+    }
+
+    if (precio) {
+        filter.precio = precio;
     }
 
     Anuncio.list(filter, limit, skip, fields, sort, function(err, rows) {
@@ -46,7 +46,7 @@ router.get('/', function(req, res, next) {
         }
         res.json({success: true, result: rows});
     });
-    */
+
 
 });
 

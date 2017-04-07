@@ -30,7 +30,7 @@ app.use('/users', require('./routes/users'));
 
 // API
 app.use('/apiv1/anuncios', require('./routes/apiv1/anuncios'));
-//app.use('/apiv1/usuarios', require('./routes/apiv1/usuarios'));
+app.use('/apiv1/usuarios', require('./routes/apiv1/usuarios'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -41,13 +41,21 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  if (isAPI(req)){ //llamada de API, devuelvo JSON
+      res.json({success: false, error: err.message});
+      return;
+  }
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
   res.render('error');
 });
+
+function isAPI(req) {
+    return req.originalUrl.indexOf('/apiv1') === 0;
+}
 
 module.exports = app;
