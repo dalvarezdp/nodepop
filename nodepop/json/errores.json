@@ -1,0 +1,26 @@
+{
+  "es":
+    {
+      "NOT_FOUND": "Página no encontrada",
+      "FAILED_TO_AUTHENTICATE_TOKEN": "Autenticación de token fallida",
+      "NO_TOKEN_PROVIDED": "Token no proporcionado",
+      "INTERNAL_ERROR": "Error interno en el servidor",
+      "USER_NOT_FOUND": "El correo eléctronico proporcionado no existe",
+      "INVALID_PASSWORD": "La contraseña proporcionada no es correcta",
+      "USER_ALREDY_EXIST": "El correo electrónico proporcionado ya existe",
+      "VALIDATION_USER_ERROR": "Algunos de los parámetros proporcionados no son correctos. Por favor, revise que la dirección de correo electronico es correcta, así como su nombre"
+    }
+  ,
+  "en":
+    {
+      "NOT_FOUND": "Page not found",
+      "FAILED_TO_AUTHENTICATE_TOKEN": "Failed to authenticate token",
+      "NO_TOKEN_PROVIDED": "Token not provided",
+      "INTERNAL_ERROR": "Internal server error",
+      "USER_NOT_FOUND": "The email provided does not exist",
+      "INVALID_PASSWORD": "The password provided is not correct",
+      "USER_ALREDY_EXIST": "The email provided already exists",
+      "VALIDATION_USER_ERROR": "Some of the parameters provided were incorrect. Please check that the email address is correct, and your name"
+    }
+
+}

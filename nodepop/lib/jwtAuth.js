@@ -14,14 +14,16 @@ module.exports = function (req, res, next) {
         req.get('x-access-token');
 
     if (!token) {
-        const err = new Error('No token provided');
-        err.status = 401;
-        return next(err);
+        let error = new Error('NO_TOKEN_PROVIDED');
+        error.status = 401;
+        return next(error);
     }
 
     jwt.verify(token, localConfig.jwt.secret, function (err, decoded) {
         if (err) {
-            return next(new Error('Invalid token'));
+            let error = new Error('FAILED_TO_AUTHENTICATE_TOKEN');
+            error.status = 401;
+            return next(error);
         }
         console.log(decoded);
         next();

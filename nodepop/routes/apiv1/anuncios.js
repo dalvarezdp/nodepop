@@ -54,7 +54,10 @@ router.get('/', function(req, res, next) {
 
     Anuncio.list(filter, limit, start, sort, function(err, rows) {
         if (err) {
-            return next(err);
+            console.log(err.message);
+            let error = new Error('INTERNAL_ERROR');
+            error.status = 500;
+            return next(error);
         }
 
         rows.forEach(function(row) {
@@ -80,7 +83,10 @@ router.get('/tags', function (req, res, next) {
 
     query.exec(function(err, rows) {
         if (err) {
-            return next(err);
+            console.log(err.message);
+            let error = new Error('INTERNAL_ERROR');
+            error.status = 500;
+            return next(error);
         }
 
         const tags = [];
@@ -103,11 +109,23 @@ router.get('/:id', function(req, res, next) {
     const query = Anuncio.findOne({_id: req.params.id});
     query.exec(function(err, anuncio) {
         if (err) {
-            return next(err);
+            console.log(err.message);
+            let error = new Error('INTERNAL_ERROR');
+            error.status = 500;
+            return next(error);
         }
         if (!anuncio) {
-            return res.status(404).json({success: false});
+            let error = new Error('NOT_FOUND');
+            error.status = 404;
+            return next(error);
         }
+
+        anuncio.foto = url.format({
+            protocol: req.protocol,
+            host: req.get('host'),
+            pathname: "/images/anuncios/" + anuncio.foto
+        });
+
         res.json({success: true, result: anuncio});
     });
 });
@@ -119,7 +137,10 @@ router.post('/', function(req, res, next) {
     const anuncio = new Anuncio(req.body);
     anuncio.save(function(err, anuncioGuardado) {
         if (err) {
-            return next(err);
+            console.log(err.message);
+            let error = new Error('INTERNAL_ERROR');
+            error.status = 500;
+            return next(error);
         }
         res.json({success: true, result: anuncioGuardado});
     });
@@ -132,7 +153,10 @@ router.put('/:id', function(req, res, next) {
     const anuncio = req.body;
     Anuncio.update({_id: id}, anuncio, function(err) {
         if (err) {
-            return next(err);
+            console.log(err.message);
+            let error = new Error('INTERNAL_ERROR');
+            error.status = 500;
+            return next(error);
         }
         res.json({success: true});
     });
@@ -144,7 +168,10 @@ router.delete('/:id', function(req, res, next) {
     const id = req.params.id;
     Anuncio.remove({_id: id}, function(err) {
         if (err) {
-            return next(err);
+            console.log(err.message);
+            let error = new Error('INTERNAL_ERROR');
+            error.status = 500;
+            return next(error);
         }
         res.json({success: true});
     });

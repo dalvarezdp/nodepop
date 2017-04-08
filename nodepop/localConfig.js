@@ -8,5 +8,9 @@ module.exports = {
     jwt: {
         secret: 'secretsupersecreta',
         expiresIn: '2d'
+    },
+    idiomas: {
+        predeterminado: 'en',
+        disponible: ['es','en']
     }
 };
