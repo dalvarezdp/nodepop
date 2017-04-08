@@ -17,13 +17,12 @@ const anuncioSchema = mongoose.Schema({
 
 
 // Creamos un método estático para recuperar anuncios paginados
-anuncioSchema.statics.list = function(filter, limit, skip, fields, sort, cb) {
+anuncioSchema.statics.list = function(filter, limit, start, sort, callback) {
     const query = Anuncio.find(filter);
     query.limit(limit);
-    query.skip(skip);
-    query.select(fields);
+    query.skip(start);
     query.sort(sort);
-    query.exec(cb);
+    query.exec(callback);
 };
 
 

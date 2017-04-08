@@ -18,29 +18,40 @@ router.use(jwtAuth);
 // GET - devuelve una lista de anuncios
 router.get('/', function(req, res, next) {
 
-    const tag = req.query.tag;
+    const tags = req.query.tags;
     const venta = req.query.venta;
     const precio = req.query.precio;
-    const limit = parseInt(req.query.limit);
-    const skip = parseInt(req.query.skip);
-    const fields = req.query.fields;
-    const sort = req.query.sort;
+    const limit = parseInt(req.query.limit) || 0;
+    const start = parseInt(req.query.start) || 0;
+    const sort = req.query.sort || null;
 
     const filter = {};
 
-    if (tag) {
-        filter.tags =  { $in: [tag] };
+
+    if (typeof req.query.tags !== 'undefined') {
+        if (typeof req.query.tags !== 'object') {
+            filter.tags = [tags];
+        }
+        if (typeof req.query.tags === 'object') {
+            filter.tags = tags;
+        }
+        filter.tags = {$in: filter.tags};
     }
+
 
     if (venta) {
         filter.venta = venta;
     }
 
-    if (precio) {
-        filter.precio = precio;
+    if (typeof req.query.nombre !== 'undefined') {
+        filter.nombre = new RegExp('^' + req.query.nombre, 'i');
     }
 
-    Anuncio.list(filter, limit, skip, fields, sort, function(err, rows) {
+    if (precio) {
+        filter.precio = filterPrice(req.query.precio);
+    }
+
+    Anuncio.list(filter, limit, start, sort, function(err, rows) {
         if (err) {
             return next(err);
         }
@@ -101,6 +112,25 @@ router.delete('/:id', function(req, res, next) {
     });
 });
 
+
+// funcion para parsear el filtro del precio
+function filterPrice(precio) {
+
+    if (/^[0-9]+\-$/.test(precio)) {
+        return {'$gte': parseInt(precio.match(/[0-9]+/))};
+    }
+
+    if (/^-[0-9]+$/.test(precio)) {
+        return {'$lte': parseInt(precio.match(/[0-9]+/))};
+    }
+
+    if (/^[0-9]+\-[0-9]+$/.test(precio)) {
+        return {'$gte': parseInt(precio.split('-')[0]), '$lte': parseInt(precio.split('-')[1])};
+    }
+
+    return parseInt(precio);
+
+}
 
 
 module.exports = router;
