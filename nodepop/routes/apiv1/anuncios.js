@@ -5,6 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
+const url = require('url');
 
 
 // Cargamos mongoose y el modelo de Anuncio
@@ -55,11 +56,47 @@ router.get('/', function(req, res, next) {
         if (err) {
             return next(err);
         }
-        res.json({success: true, result: rows});
+
+        rows.forEach(function(row) {
+            row.foto = url.format({
+                protocol: req.protocol,
+                host: req.get('host'),
+                pathname: "/images/anuncios/" + row.foto
+            });
+        });
+
+        res.status(200).json({success: true, result: rows});
     });
 
 
 });
+
+
+// funcion que obtiene la lista de tags
+router.get('/tags', function (req, res, next) {
+
+    const query = Anuncio.find();
+    query.select('tags');
+
+    query.exec(function(err, rows) {
+        if (err) {
+            return next(err);
+        }
+
+        const tags = [];
+
+        rows.forEach((row) => {
+            row.tags.forEach(function(tag) {
+                if (tags.indexOf(tag) === -1) {
+                    tags.push(tag);
+                }
+            });
+        });
+
+        res.status(200).json({success: true, result: tags});
+    });
+});
+
 
 // GET - recupera un anuncio por id
 router.get('/:id', function(req, res, next) {
@@ -74,6 +111,7 @@ router.get('/:id', function(req, res, next) {
         res.json({success: true, result: anuncio});
     });
 });
+
 
 // POST - crear un anuncio
 router.post('/', function(req, res, next) {
