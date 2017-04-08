@@ -29,6 +29,7 @@ require('./models/Usuario');
 const fs = require('fs');
 const Anuncio = mongoose.model('Anuncio');
 const Usuario = mongoose.model('Usuario');
+var crypto = require('crypto');
 
 // Array para borrado de promesas
 const arrayDePromesas = [];
@@ -52,7 +53,7 @@ function dropTables(tabla) {
 }
 
 // Funcion que recible el nombre del json y crea la tabla y sus datos en la BBDD
-function insertAnunciosJson(nombreJson) {
+function insertJson(nombreJson, coleccion) {
     var promise = new Promise(function (resolve, reject){
 
         var rutaF = 'json/'+nombreJson+'';
@@ -66,48 +67,33 @@ function insertAnunciosJson(nombreJson) {
 
             var json = JSON.parse(data);
 
-            for(var i=0;i<json.anuncios.length;i++){
-                const anuncio = new Anuncio(json.anuncios[i]);
-                anuncio.save(function(err, anuncioGuardado) {
+
+            json[coleccion].forEach(function (item) {
+
+                var mongooseItem;
+
+                switch (coleccion) {
+                    case 'anuncios':
+                        mongooseItem = new Anuncio(item);
+                        break;
+                    case 'usuarios':
+                        item.clave = crypto.createHash('sha256').update(item.clave).digest('base64');
+                        mongooseItem = new Usuario(item);
+                        break;
+                    default:
+                        return reject(new Error('Coleccion inválida'));
+                }
+
+                mongooseItem.save(function (err, itemGuardado) {
                     if (err) {
                         reject(err);
                         return;
                     }
-                    //console.log(anuncioGuardado);
+                    //console.log(itemGuardado);
                     resolve('Se ha añadido '+ nombreJson);
                 });
-            }
-        });
-    });
 
-    return promise;
-}
-
-function insertUsuariosJson(nombreJson) {
-    var promise = new Promise(function (resolve, reject){
-
-        var rutaF = 'json/'+nombreJson+'';
-
-        fs.readFile(rutaF, 'utf8', function (err, data) {
-            if (err) {
-                reject(err);
-                return;
-            }
-            //console.log(data);
-
-            var json = JSON.parse(data);
-
-            for(var i=0;i<json.usuarios.length;i++){
-                const usuario = new Usuario(json.usuarios[i]);
-                usuario.save(function(err, usuarioGuardado) {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    //console.log(usuarioGuardado);
-                    resolve('Se ha añadido '+ nombreJson);
-                });
-            }
+            });
         });
     });
 
@@ -117,9 +103,8 @@ function insertUsuariosJson(nombreJson) {
 
 arrayDePromesas.push(dropTables('Anuncio'));
 arrayDePromesas.push(dropTables('Usuario'));
-arrayDePromesas.push(insertAnunciosJson('anuncios.json'));
-arrayDePromesas.push(insertUsuariosJson('usuarios.json'));
-
+arrayDePromesas.push(insertJson('anuncios.json','anuncios'));
+arrayDePromesas.push(insertJson('usuarios.json','usuarios'));
 
 
 Promise.all(arrayDePromesas).then( function(resultados) {
@@ -130,4 +115,3 @@ Promise.all(arrayDePromesas).then( function(resultados) {
     // si alguna falla salta el catch
     console.log("Error al borrar la tabla", err);
 });
-
