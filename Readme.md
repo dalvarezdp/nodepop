@@ -2,6 +2,12 @@
 
 Nodepop es un servicio API para comprar y vender productos.
 
+## Visitar online
+
+Configurar en el `/etc/hosts` la siguiente dirección:
+
+`52.44.1.45 nodepop.rockstardevops.com`
+
 ## Requisitos
 
 * MongoDB 3.4.2 ejecutándose
